@@ -1,0 +1,154 @@
+
+@page "/R_inventario"
+
+@* Registro de los inventario *@
+@inject AuthenticationStateProvider Authentication
+
+@inject IToastService Toast
+@inject InventarioBLL inventarioBLL
+
+@using BLL
+
+<EditForm Model="inventario" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="card shadow-lg">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Registro Articulos
+                    <i class="oi oi-cart"></i>
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                      @*...................... nombre ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre Producto</label>
+                        <InputText @bind-Value="inventario.NombreProducto" placeholder="Nombre articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => inventario.NombreProducto)"/>
+                    </div>
+
+                     @*...................... Descripcion ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre</label>
+                        <InputText @bind-Value="inventario.Descripcion" placeholder="Descripcion articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => inventario.Descripcion)"/>
+                    </div>
+
+                      @*...................... NuevaCantidad ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre</label>
+                        <InputNumber @bind-Value="inventario.NuevaCantidad" placeholder="Descripcion articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => inventario.NuevaCantidad)"/>
+                    </div>
+
+                     @*...................... total ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre</label>
+                        <InputNumber @bind-Value="inventario.Total" placeholder="Descripcion articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => inventario.Total)"/>
+                    </div>
+
+
+                    @*...................... Consultar Articulo ......................*@
+
+                    <p/>
+                    <p/>
+                    <div class="form-group col-md-3" style="margin: auto;">
+                        <a class="rz-border-radius-4 shadow border border-4 btn btn-lg btn btn-warning"
+                           data-toggle="tooltip" data-placement="right" title="Ingresar al inventario"
+                           href="inventario"> Articulos
+                            <i class="oi oi-cart"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+
+                @*...................... Botones ......................*@
+
+                <div class="card-footer">
+                    <div class="form-group text-center" display: inline-block>
+
+                        <button type="submit" class="btn btn-lg btn-success" title="Guardar articulo">
+                            <span class="oi oi-document"> Guardar</span>
+                        </button>
+
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+  @code {  
+
+#nullable disable // Para quitar el aviso de nulls
+    Inventario inventario = new Inventario();
+
+    [Parameter]
+    public int InventarioId { get; set; }
+
+    [Inject]
+
+
+    public List<Inventario> lista { get; set; } = new List<Inventario>();
+
+    protected override void OnInitialized()
+    {
+        if (InventarioId > 0)
+        {
+            this.inventario.InventarioId = InventarioId;
+            this.Buscar();
+        }
+    }
+
+    public void Nuevo()
+    {
+        inventario = new Inventario();
+    }
+
+    bool Validar()
+    {
+        return inventario.Descripcion.Contains(".");
+    }
+
+    public void Guardar()
+    {
+
+        bool guardado = inventarioBLL.Guardar(inventario);
+
+        if (guardado)
+        {
+            Nuevo();
+          
+            
+        }
+        else
+        {
+            
+        }
+    }
+    private void Buscar()
+    {
+        if (inventario.InventarioId > 0)
+        {
+            var encontrado = inventarioBLL.Buscar(inventario.InventarioId);
+
+            if (encontrado != null)
+                this.inventario = encontrado;
+        }
+    }
+
+  
+
+}

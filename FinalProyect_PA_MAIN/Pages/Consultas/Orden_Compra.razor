@@ -1,0 +1,285 @@
+@page "/newarticulo"
+
+@page "/newarticulo/{ArticuloId:int}"
+
+@* Registro de nuevos articulos *@
+
+@inject AuthenticationStateProvider Authentication
+
+@inject IToastService Toast
+
+@using BLL
+@using BlazorStrap.Shared.Components.Modal
+
+<EditForm Model="articulo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+   <a type="button" class="rz-border-radius-4 shadow border border-4 btn-lg btn btn-warning" data-toggle="tooltip"
+       data-placement="right" title="Regresar al inventario" href="inventario">
+        <i
+            class="oi oi-arrow-circle-left"/>
+    </a>
+    <br/>
+    
+    <p/>
+
+    <div class="card shadow border border-4 rz-border-radius-4 card-footer d-flex justify-content-center">
+
+        <p/>
+
+            <div class="card-header justify-content-center text-center bg-ordendecompracolor">
+                <h3 class="card-title">
+                    Orden de compra
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bag-plus-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5v-.5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0zM8.5 8a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V12a.5.5 0 0 0 1 0v-1.5H10a.5.5 0 0 0 0-1H8.5V8z"/>
+                    </svg>
+                </h3>
+            </div>
+            <hr>
+
+            <div class="card-body">
+                <div class="row">
+                   
+                    @*...................... Fecha ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Fecha</label>
+                        <InputDate @bind-Value="articulo.FechaCreacion" class="form-control"/>
+                    </div>
+
+
+                    @*...................... Nombre ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre</label>
+                        <InputText @bind-Value="articulo.Nombre" placeholder="Nombre articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Nombre)"/>
+                    </div>
+
+                    @*...................... Categoria ......................*@
+
+                    <div class="form-group col-3">
+                        <label>
+                            Categoria
+                            <div class="oi oi-sort-ascending"></div>
+                        </label>
+                        <InputSelect @bind-Value="articulo.CategoriaId" class="form-select text-14">
+                            <option value="0" disabled selected>Seleccione una categoria</option>
+                            @foreach (var item in CategoriaList)
+                            {
+                                <option value="@item.CategoriaId">@item.Descripcion</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => articulo.CategoriaId)"/>
+                    </div>
+
+                    @*...................... Cantidad ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Cantidad</label>
+                        <InputNumber @bind-Value="articulo.Cantidad" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Cantidad)"/>
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+
+                    <div class="form-group col-3">
+                        <label>Costo / Unidad</label>
+                        <InputNumber @bind-Value="articulo.Costo" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Costo)"/>
+                    </div>
+
+                    @*...................... Precio ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Precio</label>
+                        <InputNumber @bind-Value="articulo.Precio" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Precio)"/>
+                    </div>
+
+                    @*...................... ITBIS ......................*@
+
+                    <div class="form-group col-md-3">
+                        <label>ITBIS</label>
+                        <InputSelect @bind-Value="articulo.ITBIS" class="form-select text-14">
+                            <option value="0" disabled selected>Seleccione un %</option>
+                            <option value="1">0%</option>
+                            <option value="18">18%</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => articulo.ITBIS)"/>
+                    </div>
+
+                    @*...................... Consultar Articulo ......................*@
+
+                    <p/>
+                    <p/>
+                    <div class="form-group align-right" style="margin: auto;">
+                        <a class="rz-border-radius-4 shadow border border-4 btn btn-lg bg-inventariocolor"
+                           data-toggle="tooltip" data-placement="right" title="Ingresar al inventario"
+                           href="inventario"> Inventario
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-minecart-loaded" viewBox="0 0 16 16">
+                            <path d="M4 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm8-1a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM.115 3.18A.5.5 0 0 1 .5 3h15a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 14 12H2a.5.5 0 0 1-.491-.408l-1.5-8a.5.5 0 0 1 .106-.411zm.987.82 1.313 7h11.17l1.313-7H1.102z"/>
+                            <path fill-rule="evenodd" d="M6 1a2.498 2.498 0 0 1 4 0c.818 0 1.545.394 2 1 .67 0 1.552.57 2 1h-2c-.314 0-.611-.15-.8-.4-.274-.365-.71-.6-1.2-.6-.314 0-.611-.15-.8-.4a1.497 1.497 0 0 0-2.4 0c-.189.25-.486.4-.8.4-.507 0-.955.251-1.228.638-.09.13-.194.25-.308.362H3c.13-.147.401-.432.562-.545a1.63 1.63 0 0 0 .393-.393A2.498 2.498 0 0 1 6 1z"/>
+                        </svg>
+                        </a>
+                        <label>ㅤㅤㅤㅤㅤㅤㅤㅤ</label>
+                    
+                
+    
+
+                @*...................... Botones ......................*@
+
+                
+                    
+
+                        <button type="button" class="btn btn-lg btn-primary" @onclick="Nuevo" title="Nuevo articulo">
+                            <span class="oi oi-file"> Nuevo</span>
+                        </button>
+
+                        <button type="submit" class="btn btn-lg btn-success" title="Guardar articulo">
+                            <span class="oi oi-document"> Guardar</span>
+                        </button>
+
+                        <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar"
+                                title="Eliminar articulo">
+                            <span class="oi oi-trash"> Eliminar</span>
+                        </button>
+                        
+                        </div>
+                <br/>
+                
+                <br/>
+                <br>
+                <hr>
+                        
+                    
+                    <div> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-text" viewBox="0 0 16 16">
+  <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+  <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+</svg>
+          
+                Puede consultar los articulos en el inventario.
+           
+        </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+  
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+    Articulo articulo = new Articulo();
+
+    [Parameter]
+    public int ArticuloId { get; set; }
+
+    [Inject]
+    public CategoriaBLL categoriaBLL { get; set; } // Inyectando BLLS
+
+    [Inject]
+    public ArticuloBLL articuloBLL { get; set; } // Inyectando BLL
+
+    List<Categoria> CategoriaList = new List<Categoria>();
+
+
+    //-----------------------------------------------------------------------
+
+    protected override void OnInitialized()
+    {
+        articulo = new Articulo();
+        CategoriaList = categoriaBLL.GetList(c => true);
+
+        if (ArticuloId > 0)
+        {
+            articulo.ArticuloId = ArticuloId;
+            this.Buscar();
+        }
+    }
+
+    public void Nuevo() // Nuevo articulo
+    {
+        articulo = new Articulo();
+        CategoriaList = categoriaBLL.GetList(c => true);
+    }
+
+    public void Guardar() // Guardar articulo
+    {
+        if (articulo.Precio < articulo.Costo)
+        {
+            Toast.ShowWarning("El precio debe ser mayor al costo"); // Validacion
+            return;
+        }
+
+        var articulo2 = articuloBLL.ExisteNombre(articulo.Nombre);
+        if (articulo2 == null) //si no existe
+        {
+            if (articuloBLL.Guardar(articulo))
+            {
+                Toast.ShowSuccess($"Articulo: {articulo.Nombre}, Guardado correctamente");
+                articulo = new Articulo();
+            }
+            else
+                Toast.ShowError("No fue posible guardar");
+        }
+        else // si existe
+        {
+            if (articulo2.Nombre.ToLower() == articulo.Nombre.ToLower() && articulo2.ArticuloId == articulo.ArticuloId)
+            {
+                if (articuloBLL.Guardar(articulo))
+                {
+                    Toast.ShowSuccess($"Articulo: {articulo.Nombre}, Guardado correctamente");
+                    articulo = new Articulo();
+                }
+                else
+                    Toast.ShowError("No fue posible guardar");
+            }
+            else
+            {
+                Toast.ShowError($"Articulo: {articulo.Nombre}, ya esta registrado");
+            }
+        }
+    }
+
+    public void Buscar() // Buscar articulo
+    {
+        if (this.articulo.ArticuloId > 0)
+        {
+            var Articulo = articuloBLL.Buscar(articulo.ArticuloId);
+
+            if (Articulo != null)
+            {
+                articulo = Articulo;
+
+                Toast.ShowSuccess($"Articulo: {articulo.Nombre}, encontrado ");
+            }
+            else
+            {
+                Toast.ShowWarning($"No existe un articulo con este Id: {articulo.ArticuloId}");
+            }
+        }
+    }
+
+    public void Eliminar() // Eliminar articulo
+    {
+        bool Eliminar;
+
+        Eliminar = articuloBLL.Eliminar(articulo.ArticuloId);
+
+        if (Eliminar)
+        {
+            articulo = new Articulo();
+            CategoriaList = categoriaBLL.GetList(c => true);
+            Toast.ShowSuccess("Eliminado correctamente");
+        }
+        else
+            Toast.ShowError("No fue posible eliminar");
+    }
+    }
+

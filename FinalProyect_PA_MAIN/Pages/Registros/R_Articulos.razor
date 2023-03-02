@@ -1,0 +1,249 @@
+@page "/articulo"
+
+@page "/articulo/{ArticuloId:int}"
+
+@* Registro de articulos *@
+
+@inject AuthenticationStateProvider Authentication
+
+@inject IToastService Toast
+
+@using BLL
+
+<EditForm Model="articulo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="card shadow-lg">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Registro Articulos
+                    <i class="oi oi-cart"></i>
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    @*...................... Fecha ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Fecha</label>
+                        <InputDate @bind-Value="articulo.FechaCreacion" class="form-control"/>
+                    </div>
+
+
+                    @*...................... Nombre ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Nombre</label>
+                        <InputText @bind-Value="articulo.Nombre" placeholder="Nombre articulo" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Nombre)"/>
+                    </div>
+
+                    @*...................... Categoria ......................*@
+
+                    <div class="form-group col-3">
+                        <label>
+                            Categoria
+                            <div class="oi oi-sort-ascending"></div>
+                        </label>
+                        <InputSelect @bind-Value="articulo.CategoriaId" class="form-select text-14">
+                            <option value="0" disabled selected>Seleccione una categoria</option>
+                            @foreach (var item in CategoriaList)
+                            {
+                                <option value="@item.CategoriaId">@item.Descripcion</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => articulo.CategoriaId)"/>
+                    </div>
+
+                    @*...................... Cantidad ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Cantidad</label>
+                        <InputNumber @bind-Value="articulo.Cantidad" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Cantidad)"/>
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+
+                    <div class="form-group col-3">
+                        <label>Costo / Unidad</label>
+                        <InputNumber @bind-Value="articulo.Costo" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Costo)"/>
+                    </div>
+
+                    @*...................... Precio ......................*@
+
+                    <div class="form-group col-3">
+                        <label>Precio</label>
+                        <InputNumber @bind-Value="articulo.Precio" class="form-control"/>
+                        <ValidationMessage For="@(() => articulo.Precio)"/>
+                    </div>
+
+                    @*...................... ITBIS ......................*@
+
+                    <div class="form-group col-md-3">
+                        <label>ITBIS</label>
+                        <InputSelect @bind-Value="articulo.ITBIS" class="form-select text-14">
+                            <option value="0" disabled selected>Seleccione un %</option>
+                            <option value="1">0%</option>
+                            <option value="18">18%</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => articulo.ITBIS)"/>
+                    </div>
+
+                    @*...................... Consultar Articulo ......................*@
+
+                    <p/>
+                    <p/>
+                    <div class="form-group col-md-3" style="margin: auto;">
+                        <a class="rz-border-radius-4 shadow border border-4 btn btn-lg btn btn-warning"
+                           data-toggle="tooltip" data-placement="right" title="Ingresar al inventario"
+                           href="inventario"> Articulos
+                            <i class="oi oi-cart"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+
+                @*...................... Botones ......................*@
+
+                <div class="card-footer">
+                    <div class="form-group text-center" display: inline-block>
+
+                        <button type="button" class="btn btn-lg btn-primary" @onclick="Nuevo" title="Nuevo articulo">
+                            <span class="oi oi-file"> Nuevo</span>
+                        </button>
+
+                        <button type="submit" class="btn btn-lg btn-success" title="Guardar articulo">
+                            <span class="oi oi-document"> Guardar</span>
+                        </button>
+
+                        <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar"
+                                title="Eliminar articulo">
+                            <span class="oi oi-trash"> Eliminar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+    Articulo articulo = new Articulo();
+
+    [Parameter]
+    public int ArticuloId { get; set; }
+
+    [Inject]
+    public CategoriaBLL categoriaBLL { get; set; } // Inyectando BLLS
+
+    [Inject]
+    public ArticuloBLL articuloBLL { get; set; } // Inyectando BLL
+
+    List<Categoria> CategoriaList = new List<Categoria>();
+
+
+    //-----------------------------------------------------------------------
+
+    protected override void OnInitialized()
+    {
+        articulo = new Articulo();
+        CategoriaList = categoriaBLL.GetList(c => true);
+
+        if (ArticuloId > 0)
+        {
+            articulo.ArticuloId = ArticuloId;
+            this.Buscar();
+        }
+    }
+
+    public void Nuevo() // Nuevo articulo
+    {
+        articulo = new Articulo();
+        CategoriaList = categoriaBLL.GetList(c => true);
+    }
+
+    public void Guardar() // Guardar articulo
+    {
+        if (articulo.Precio < articulo.Costo)
+        {
+            Toast.ShowWarning("El precio debe ser mayor al costo"); // Validacion
+            return;
+        }
+
+        var articulo2 = articuloBLL.ExisteNombre(articulo.Nombre);
+        if (articulo2 == null) //si no existe
+        {
+            if (articuloBLL.Guardar(articulo))
+            {
+                Toast.ShowSuccess($"Articulo: {articulo.Nombre}, Guardado correctamente");
+                articulo = new Articulo();
+            }
+            else
+                Toast.ShowError("No fue posible guardar");
+        }
+        else // si existe
+        {
+            if (articulo2.Nombre.ToLower() == articulo.Nombre.ToLower() && articulo2.ArticuloId == articulo.ArticuloId)
+            {
+                if (articuloBLL.Guardar(articulo))
+                {
+                    Toast.ShowSuccess($"Articulo: {articulo.Nombre}, Guardado correctamente");
+                    articulo = new Articulo();
+                }
+                else
+                    Toast.ShowError("No fue posible guardar");
+            }
+            else
+            {
+                Toast.ShowError($"Articulo: {articulo.Nombre}, ya esta registrado");
+            }
+        }
+    }
+
+    public void Buscar() // Buscar articulo
+    {
+        if (this.articulo.ArticuloId > 0)
+        {
+            var Articulo = articuloBLL.Buscar(articulo.ArticuloId);
+
+            if (Articulo != null)
+            {
+                articulo = Articulo;
+
+                Toast.ShowSuccess($"Articulo: {articulo.Nombre}, encontrado ");
+            }
+            else
+            {
+                Toast.ShowWarning($"No existe un articulo con este Id: {articulo.ArticuloId}");
+            }
+        }
+    }
+
+    public void Eliminar() // Eliminar articulo
+    {
+        bool Eliminar;
+
+        Eliminar = articuloBLL.Eliminar(articulo.ArticuloId);
+
+        if (Eliminar)
+        {
+            articulo = new Articulo();
+            CategoriaList = categoriaBLL.GetList(c => true);
+            Toast.ShowSuccess("Eliminado correctamente");
+        }
+        else
+            Toast.ShowError("No fue posible eliminar");
+    }
+    }
+

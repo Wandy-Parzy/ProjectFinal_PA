@@ -1,0 +1,109 @@
+@page "/reporteventas"
+
+@*--------- Reporte Ventas ---------*@
+@using Models;
+@using ProyectoFinal.BLL;
+
+<EditForm Model="listaventas">
+
+    <a type="button" class="rz-border-radius-4 shadow border border-4 btn-lg btn btn-warning" data-toggle="tooltip"
+       data-placement="right" title="Regresar al formulario" href="ventas">
+        <i class="oi oi-arrow-circle-left"/>
+    </a>
+    <br/>
+    <p/>
+
+    <div class="card shadow border border-4 rz-border-radius-4 card-footer d-flex justify-content-center">
+
+        <p/>
+        <div class="card-header rz-border-radius-4 shadow text-center">
+            <h4>
+                Ventas
+                <div class="oi oi-cart"></div>
+            </h4>
+        </div>
+
+        <p/>
+        <hr>
+        <table class="shadow 4 rz-border-radius-4 table table-light table-striped table-bordered">
+            <thead class="thead">
+            <tr class="text-center table bg-reportecolor">
+                <th class="border border-3">Código</th>
+
+                <th class="border border-3">Fecha Venta</th>
+
+                <th class="border border-3">Unidades vendidas</th>
+
+                <th class="border border-3">SubTotal</th>
+
+                <th class="border border-3">ITBIS</th>
+
+                <th class="border border-3">Total</th>
+
+                <th class="border border-3">Ver</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (listaventas.Count == 0)
+            {
+                <p/>
+                <span>Empty</span>
+            }
+            else
+            {
+                @foreach (Ventas item in listaventas)
+                {
+                    <tr class="text-center">
+                        <td class="border border-3">@item.VentaId</td>
+
+                        <td class="border border-3">@item.Fecha</td>
+
+                        <td class="border border-3">@item.UnidadesVendidas</td>
+
+                        <td class="border border-3">RD$ @item.SubTotal</td>
+
+                        <td class="border border-3">@item.ITBIS</td>
+
+                        <td class="border border-3">RD$ @item.Total</td>
+
+                        <td class="border border-3">
+                            <a class="btn btn-sm btn-outline-success oi oi-eye"
+                               href="ventas/@item.VentaId">
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+    <p/>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+
+    public DateOnly Fecha { get; set; }
+
+    public List<Ventas> listaventas { get; set; } = new List<Ventas>();
+
+    public List<Articulo> articuloList { get; set; } = new List<Articulo>();
+
+    public Ventas ventas { get; set; } = new Ventas();
+
+    public Articulo Articulo { get; set; }
+
+    [Inject]
+    public VentasBLL ventasBLL { get; set; }
+
+    [Inject]
+    public ArticuloBLL articuloBLL { get; set; }
+
+    protected override void OnInitialized()
+    {
+        listaventas = ventasBLL.GetList(e => true);
+        articuloList = articuloBLL.GetList(e => true);
+    }
+
+}

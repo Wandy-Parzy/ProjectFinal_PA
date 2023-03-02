@@ -1,0 +1,183 @@
+@page "/c_suplidor"
+@*--------- Consulta suplidor ---------*@
+@using Models;
+@using ProyectoFinal.BLL
+
+<EditForm Model="suplidor">
+
+    <a type="button" class="rz-border-radius-4 shadow border border-4 btn-lg btn btn-warning" data-toggle="tooltip"
+       data-placement="right" title="Regresar al formulario" href="suplidor">
+        <i class="oi oi-arrow-circle-left"/>
+    </a>
+    <br/>
+    <p/>
+
+    <div class="card ">
+        <div class="card-header">
+
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                </svg> Consulta Suplidores <i class="oi oi-cart"></i>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="input-group d-flex align-items-end">
+
+                    <div class="form-group col-md-3">
+                        <InputSelect class="form-select text-14" @bind-Value="Filtro">
+                            <option value="0" disabled selected>Seleccione un filtro</option>
+                            <option value="1">Nombre</option>
+                            <option value="2">Email</option>
+                            <option value="3">Telefono</option>
+                            <option value="4">Descripción articulo</option>
+                        </InputSelect>
+                    </div>
+                    <div class="Form-group col-md-1"></div>
+
+                    <div class="Form-group col-3">
+                        <label>Criterio</label>
+                        <InputText class="form-control" @bind-Value="Criterio"
+                                   placeholder="Ingrese el criterio de busqueda"/>
+                    </div>
+
+                    <button type="button" class="btn btn-consulta" @onclick="Consultar" title="Consultar suplidores">
+                        <i class="oi oi-grid-four-up mr-2"/> Consultar
+                    </button>
+                </div>
+                <hr>
+
+                <div class="row">
+
+                    <div class="Form-group col-2">
+                        <span class="form-group ">Desde</span>
+                        <InputDate @bind-Value="fechaDesde" class="form-control"/>
+                    </div>
+
+
+                    <div class="Form-group col-2">
+                        <span class="form-group">Hasta</span>
+                        <InputDate @bind-Value="fechaHasta" class="form-control"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-light table-striped table-bordered">
+            <thead class="thead">
+            <tr class="table">
+
+                <th>Nombre</th>
+
+                <th>Email</th>
+
+                <th>Teléfono</th>
+
+                <th>
+                    Dirección
+                    <div class="oi oi-map-marker"></div>
+                </th>
+
+                <th>
+                    Descripción del articulo
+                    <div class="oi oi-credit-breack"></div>
+                </th>
+
+                <th>Fecha Ingreso</th>
+
+                <th>Ver</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            @if (suplidorList.Count == 0)
+            {
+                <span>Empty</span>
+            }
+            else
+            {
+                @foreach (var item in suplidorList)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+
+                        <td>@item.Email</td>
+
+                        <td>@item.Telefono</td>
+
+                        <td>@item.Direccion</td>
+
+                        <td>@item.DescripcionArticulo</td>
+
+                        <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+
+                        <td>
+                            <a class="btn btn-sm btn-outline-success oi oi-eye" href="suplidor/@item.SuplidorId"></a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+    public string Filtro;
+    public string Criterio;
+    private DateTime fechaDesde { get; set; } = new DateTime(1970, 12, 2);
+    private DateTime fechaHasta { get; set; } = new DateTime(2030, 12, 2);
+
+    public DateOnly Fecha { get; set; }
+
+    public List<Suplidor> suplidorList { get; set; } = new List<Suplidor>();
+
+    public Suplidor suplidor { get; set; } = new Suplidor();
+
+    [Inject]
+    public SuplidorBLL suplidorBLL { get; set; }
+
+    bool listado = false;
+
+    protected override void OnInitialized()
+    {
+        Filtro = "0";
+        suplidorList = suplidorBLL.GetList(e => true);
+    }
+
+    private void Consultar()
+    {
+        suplidorList = new List<Suplidor>();
+        suplidor = new Suplidor();
+
+        suplidorList = suplidorBLL.GetList(e => true);
+
+        if (Criterio != null)
+        {
+            switch (Filtro)
+            {
+                case "1": // Nombre suplidor
+                    suplidorList = suplidorBLL.GetList(p => p.Nombre.ToLower().Contains(Criterio.ToLower()));
+                    break;
+                case "2": // Email suplidor
+                    suplidorList = suplidorBLL.GetList(p => p.Email.ToLower().Contains(Criterio.ToLower()));
+                    break;
+                case "3": // Telefono suplidor
+                    suplidorList = suplidorBLL.GetList(p => p.Telefono.ToLower().Contains(Criterio.ToLower()));
+                    break;
+                case "4": // Descripción articulo
+                    suplidorList = suplidorBLL.GetList(p => p.DescripcionArticulo.ToLower().Contains(Criterio.ToLower()));
+                    break;
+            }
+        }
+        else
+        {
+            suplidorList = suplidorBLL.GetList(e => e.Fecha >= fechaDesde && e.Fecha <= fechaHasta);
+        }
+    }
+}

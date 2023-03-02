@@ -1,0 +1,42 @@
+﻿@page "/"
+@namespace ProyectoFinal.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ProyectoFinal</title>
+    <base href="~/"/>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <link href="css/site.css" rel="stylesheet"/>
+    <link href="ProyectoFinal.styles.css" rel="stylesheet"/>
+
+    <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+
+</head>
+<body>
+
+<component type="typeof(App)" render-mode="ServerPrerendered"/>
+
+<div id="blazor-error-ui">
+    <environment include="Staging,Production">
+        Se ha producido un error. Es posible que esta aplicación ya no responda hasta que se vuelva a cargar.
+    </environment>
+    <environment include="Development">
+        Se ha producido una excepción no controlada. Consulte las herramientas de desarrollo del navegador para obtener más información.
+    </environment>
+    <a href="" class="reload">Recargar</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+<script src="_framework/blazor.server.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+<script src="_content/BlazorStrap/blazorStrap.js"></script>
+</body>
+</html>

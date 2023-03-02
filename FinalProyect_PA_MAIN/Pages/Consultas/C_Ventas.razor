@@ -1,0 +1,177 @@
+@page "/c_ventas"
+
+@*--------- Consulta Ventas ---------*@
+@using Models
+@using ProyectoFinal.BLL
+@inject IToastService Toast
+
+<EditForm Model="venta" OnValidSubmit="Consultar">
+    <DataAnnotationsValidator/>
+
+    <a type="button" class="rz-border-radius-4 shadow border border-4 btn-lg btn btn-warning" data-toggle="tooltip"
+       data-placement="right" title="Regresar al formulario" href="ventas">
+        <i class="oi oi-arrow-circle-left"/>
+    </a>
+    <br/>
+    <p/>
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                </svg> Consulta Ventas
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-shop" viewBox="0 0 16 16">
+                    <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z"/>
+                </svg>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="input-group d-flex align-items-end">
+
+                    <div class="form-group col-md-3">
+                        <InputSelect class="form-select text-14" @bind-Value="Filtro">
+                            <option value="0" disabled selected>Seleccione un filtro</option>
+                            <option value="1">Unidades</option>
+                            <option value="2">SubTotal</option>
+                            <option value="3">ITBIS</option>
+                            <option value="4">Total</option>
+                        </InputSelect>
+                    </div>
+                    <div class="Form-group col-md-1"></div>
+
+                    <div class="Form-group col-3">
+                        <label>Criterio</label>
+                        <InputText class="form-control" @bind-Value="Criterio"
+                                   placeholder="Ingrese el criterio de busqueda"/>
+                    </div>
+
+                    <button type="button" class="btn btn-consulta" @onclick="Consultar" title="Consultar ventas">
+                        <i class="oi oi-grid-four-up mr-2"/> Consultar
+                    </button>
+                </div>
+                <hr>
+
+                <div class="row">
+
+                    <div class="Form-group col-2">
+                        <span class="form-group ">Desde</span>
+                        <InputDate @bind-Value="fechaDesde" class="form-control"/>
+                    </div>
+
+                    <div class="Form-group col-2">
+                        <span class="form-group">Hasta</span>
+                        <InputDate @bind-Value="fechaHasta" class="form-control"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-light table-striped table-bordered">
+            <thead class="thead">
+            <tr class="table">
+
+                <th>Código</th>
+
+                <th>Fecha Venta</th>
+
+                <th>Unidades vendidas</th>
+
+                <th>SubTotal</th>
+
+                <th>ITBIS</th>
+
+                <th>Total</th>
+
+                <th>Ver</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (lista.Count == 0)
+            {
+                <span>Empty</span>
+            }
+            else
+            {
+                @foreach (var item in lista)
+                {
+                    <tr>
+                        <td>@item.VentaId</td>
+
+                        <td>@item.Fecha</td>
+
+                        <td>@item.UnidadesVendidas</td>
+
+                        <td>RD$ @item.SubTotal</td>
+
+                        <td>@item.ITBIS</td>
+
+                        <td>RD$ @item.Total</td>
+
+                        <td>
+                            <a class="btn btn-sm btn-outline-success oi oi-eye" href="ventas/@item.VentaId"></a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+    public string Filtro;
+    public string Criterio;
+    private DateTime fechaDesde { get; set; } = new DateTime(2022, 4, 10);
+    private DateTime fechaHasta { get; set; } = new DateTime(2030, 4, 10);
+    public Ventas venta { get; set; } = new Ventas();
+    public List<Ventas> lista { get; set; } = new List<Ventas>();
+
+    [Inject]
+    public VentasBLL ventaBLL { get; set; }
+
+    bool listado = false;
+
+    protected override void OnInitialized()
+    {
+        Filtro = "0";
+        lista = ventaBLL.GetList(e => true);
+    }
+
+    private void Consultar()
+    {
+        lista = new List<Ventas>();
+        venta = new Ventas();
+
+        lista = ventaBLL.GetList(e => true);
+
+        if (Criterio != null)
+        {
+            switch (Filtro)
+            {
+                case "1": // Unidades
+                    lista = ventaBLL.GetList(e => e.UnidadesVendidas == int.Parse(Criterio));
+                    break;
+                case "2": // SubTotal
+                    lista = ventaBLL.GetList(e => e.SubTotal == int.Parse(Criterio));
+                    break;
+                case "3": // ITBIS
+                    lista = ventaBLL.GetList(e => e.ITBIS == int.Parse(Criterio));
+                    break;
+                case "4": // Total
+                    lista = ventaBLL.GetList(e => e.Total == int.Parse(Criterio));
+                    break;
+            }
+        }
+        else
+        {
+            lista = ventaBLL.GetList(e => e.Fecha >= fechaDesde && e.Fecha <= fechaHasta);
+        }
+    }
+}

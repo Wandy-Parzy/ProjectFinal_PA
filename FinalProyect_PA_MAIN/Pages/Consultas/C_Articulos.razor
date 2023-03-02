@@ -1,0 +1,196 @@
+@page "/c_articulo"
+@*--------- Consulta Articulos ---------*@
+@using Models;
+@using ProyectoFinal.BLL
+
+<EditForm Model="lista">
+
+    <a type="button" class="rz-border-radius-4 shadow border border-4 btn-lg btn btn-warning" data-toggle="tooltip"
+       data-placement="right" title="Regresar al formulario" href="articulo">
+        <i class="oi oi-arrow-circle-left"/>
+    </a>
+    <br/>
+    <p/>
+
+    <div class="card ">
+
+        <div class="card-header">
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                </svg> Consulta Articulos
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-scooter" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M9 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-.39l1.4 7a2.5 2.5 0 1 1-.98.195l-.189-.938-2.43 3.527A.5.5 0 0 1 9.5 13H4.95a2.5 2.5 0 1 1 0-1h4.287l2.831-4.11L11.09 3H9.5a.5.5 0 0 1-.5-.5ZM3.915 12a1.5 1.5 0 1 0 0 1H2.5a.5.5 0 0 1 0-1h1.415Zm8.817-.789A1.499 1.499 0 0 0 13.5 14a1.5 1.5 0 0 0 .213-2.985l.277 1.387a.5.5 0 0 1-.98.196l-.278-1.387Z"/>
+                </svg>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="input-group d-flex align-items-end">
+
+                    <div class="form-group col-md-3">
+                        <InputSelect class="form-select text-14" @bind-Value="Filtro">
+                            <option value="0" disabled selected>Seleccione un filtro</option>
+                            <option value="1">Código</option>
+                            <option value="2">Nombre</option>
+                            <option value="3">Categoria</option>
+                            <option value="4">Costo / Unidad</option>
+                            <option value="5">Precio / Venta</option>
+                        </InputSelect>
+                    </div>
+                    <div class="Form-group col-md-1"></div>
+
+                    <div class="Form-group col-3">
+                        <label>Criterio</label>
+                        <InputText class="form-control" @bind-Value="Criterio"
+                                   placeholder="Ingrese el criterio de busqueda"/>
+                    </div>
+
+                    <button type="button" class="btn btn-consulta" @onclick="Consultar" title="Consultar articulos">
+                        <i class="oi oi-grid-four-up mr-2"/> Consultar
+                    </button>
+                </div>
+                <hr>
+
+                <div class="row">
+
+                    <div class="Form-group col-2">
+                        <span class="form-group ">Desde</span>
+                        <InputDate @bind-Value="fechaDesde" class="form-control"/>
+                    </div>
+
+
+                    <div class="Form-group col-2">
+                        <span class="form-group">Hasta</span>
+                        <InputDate @bind-Value="fechaHasta" class="form-control"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-light table-striped table-bordered">
+            <thead class="thead">
+            <tr class="table">
+                <th>Código</th>
+
+                <th>Nombre</th>
+
+                <th>Categoria</th>
+
+                <th>Cantidad</th>
+
+                <th>Costo / Unidad</th>
+
+                <th>Precio / Venta</th>
+
+                <th>ITBIS</th>
+
+                <th>Fecha Registro</th>
+
+                <th>Ver</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            @if (lista.Count == 0)
+            {
+                <span>Empty</span>
+            }
+            else
+            {
+                @foreach (var item in lista)
+                {
+                    descripcion = categoriaBLL.Buscar(item.CategoriaId);
+                    if (descripcion == null) break;
+                    <tr>
+                        <td>@item.ArticuloId</td>
+
+                        <td>@item.Nombre</td>
+
+                        <td>@descripcion.Descripcion</td>
+
+                        <td>@item.Cantidad</td>
+
+                        <td>RD$ @item.Costo</td>
+
+                        <td>RD$ @item.Precio</td>
+
+                        <td>@item.ITBIS %</td>
+
+                        <td>@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-success oi oi-eye" href="articulo/@item.ArticuloId"></a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+    public string Filtro;
+    public string Criterio;
+    private DateTime fechaDesde { get; set; } = new DateTime(2022, 4, 10);
+    private DateTime fechaHasta { get; set; } = new DateTime(2030, 4, 2);
+
+    public DateOnly Fecha { get; set; }
+
+    public List<Articulo> lista { get; set; } = new List<Articulo>();
+
+    public Articulo articulo { get; set; } = new Articulo();
+
+    public Categoria descripcion { get; set; } = new Categoria();
+
+    [Inject]
+    public CategoriaBLL categoriaBLL { get; set; }
+    
+    [Inject]
+    public ArticuloBLL articuloBLL { get; set; }
+
+    bool listado = false;
+
+    protected override void OnInitialized()
+    {
+        Filtro = "0";
+        lista = articuloBLL.GetList(e => true);
+    }
+
+    private void Consultar()
+    {
+        lista = new List<Articulo>();
+        articulo = new Articulo();
+        lista = articuloBLL.GetList(e => true);
+        
+        if (Criterio != null)
+        {
+            switch (Filtro)
+            {
+                case "1": //Código
+                    lista = articuloBLL.GetList(e => e.ArticuloId == int.Parse(Criterio));
+                    break;
+                case "2": // Nombre
+                    lista = articuloBLL.GetList(p => p.Nombre.ToLower().Contains(Criterio.ToLower()));
+                    break;
+                case "3": // Categoria
+                    lista = articuloBLL.GetList(p => p.Categoria.Descripcion.ToLower().Contains(Criterio.ToLower())); 
+                    break;
+                case "4": // Costo
+                    lista = articuloBLL.GetList(p => p.Costo == int.Parse(Criterio));
+                    break;
+                case "5": // Precio
+                    lista = articuloBLL.GetList(p => p.Precio == int.Parse(Criterio));
+                    break;
+            }
+        }
+        else
+        {
+            lista = articuloBLL.GetList(e => e.FechaCreacion >= fechaDesde && e.FechaCreacion <= fechaHasta);
+        }
+    }
+}

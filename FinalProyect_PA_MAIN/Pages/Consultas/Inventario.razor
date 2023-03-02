@@ -1,0 +1,141 @@
+@page "/inventario"
+
+@*--------- Orden de compras Articulos ---------*@
+
+@using Models;
+@using ProyectoFinal.BLL;
+
+<EditForm Model="lista">
+
+    <div class="card shadow border border-4 rz-border-radius-4 card-footer d-flex justify-content-center">
+
+        <p/>
+        <div class="card-header rz-border-radius-4 shadow text-center">
+            <h4>
+                Inventario
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-box-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.004-.001.274-.11a.75.75 0 0 1 .558 0l.274.11.004.001 6.971 2.789Zm-1.374.527L8 5.962 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339Z"/>
+                </svg>
+            </h4>
+        </div>
+        <p/>
+        <hr>
+        <table class="shadow 4 rz-border-radius-4 table table-light table-striped table-bordered">
+            <thead class="thead">
+            <tr class="text-center table bg-inventariocolor">
+                <th class="border border-3">Código</th>
+
+                <th class="border border-3">Descripción Articulo</th>
+
+                <th class="border border-3">Categoria</th>
+
+                <th class="border border-3">Cantidad</th>
+
+                <th class="border border-3">Costo / Unidad</th>
+
+                <th class="border border-3">Precio</th>
+
+                <th class="border border-3">Fecha de compra</th>
+
+                <th class="border border-3">Ver</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (lista.Count == 0)
+            {
+                <p/>
+                <span>Empty</span>
+            }
+            else
+            {
+                @foreach (var item in lista)
+                {
+                    descripcion = categoriaBLL.Buscar(item.CategoriaId);
+                    if (descripcion == null) break;
+                    <tr class="text-center">
+                        <td class="border border-3">@item.ArticuloId</td>
+
+                        <td class="border border-3">@item.Nombre</td>
+
+                        <td class="border border-3">@descripcion.Descripcion</td>
+
+                        <td class="border border-3">@item.Cantidad</td>
+
+                        <td class="border border-3">RD$ @item.Costo</td>
+
+                        <td class="border border-3">RD$ @item.Precio</td>
+
+                        <td class="border border-3">@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
+
+                        <td class="border border-3">
+                            <a class="btn btn-sm btn-outline-success oi oi-eye"
+                               href="articulo/@item.ArticuloId">
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+
+        <form class="row gy-3">
+
+            @*...................... Ventana de reorden ......................*@
+
+            <p/>
+            <p/>
+            <div class="form-group col-md-3" style="margin: auto;">
+                <a class="rz-border-radius-4 shadow border border-4 btn btn-lg btn btn-danger" data-toggle="tooltip"
+                   data-placement="right" title="Realizar reorden" href="reorden">
+                    Reorden
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag-fill" viewBox="0 0 16 16">
+                        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5z"/>
+                    </svg>
+                </a>
+            </div>
+
+            @*...................... Ventana de orden de compra ......................*@
+
+            <div class="form-group col-md-3" style="margin: auto;">
+                <a class="rz-border-radius-4 shadow border border-4 btn btn-lg btn btn-primary" data-toggle="tooltip"
+                   data-placement="right" title="Realizar orden de compra" href="newarticulo">
+                    Orden de
+                    compra
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag-plus-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5v-.5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0zM8.5 8a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V12a.5.5 0 0 0 1 0v-1.5H10a.5.5 0 0 0 0-1H8.5V8z"/>
+                    </svg>
+                </a>
+            </div>
+        </form>
+        <hr/>
+    </div>
+    <p/>
+</EditForm>
+
+@code {
+
+#nullable disable // Para quitar el aviso de nulls
+
+    public DateOnly Fecha { get; set; }
+
+    public DateTime _Fecha { get; set; } = DateTime.Now;
+
+    public List<Articulo> lista { get; set; } = new List<Articulo>();
+
+    public Articulo articulo { get; set; } = new Articulo();
+
+    public Categoria descripcion { get; set; }
+
+    [Inject]
+    public CategoriaBLL categoriaBLL { get; set; }
+
+    [Inject]
+    public ArticuloBLL articuloBLL { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        lista = articuloBLL.GetList(e => true);
+    }
+
+}
